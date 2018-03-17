@@ -1,0 +1,151 @@
+<style lang="less" rel="stylesheet/less">
+	@import "wx-scroll-view";
+</style>
+<template>
+	<scroll-view scroll-y scroll-with-animation style="height: {{height}}px;" @scrolltoupper="_upper" @scrolltolower="_lower"
+	             @scroll="_scroll"
+	             scroll-into-view="{{toView}}">
+		<view id="scroll_header"></view>
+		<slot name="header"></slot>
+		<slot name="content">默认内容</slot>
+		<slot name="footer" id="scroll_footer"></slot>
+
+		<view wx:if="{{loadingStatus==0 || loadingStatus==2}}" class="loadmore">
+			<view class="loading"></view>
+			<view class="loadmore_tips">{{message}}</view>
+		</view>
+
+		<view wx:if="{{loadingStatus==1}}" class="loadmore no_more">
+			<view class="loadmore_tips">{{ noMore}}</view>
+		</view>
+
+		<view wx:if="{{loadingStatus==4}}" class="loadmore no_more">
+			<view class="loadmore_tips" @tap="_error"> 加载异常
+				<view class="load_error">重新加载</view>
+			</view>
+		</view>
+		<abnormal category="DATA" wx:if="{{loadingStatus==3}}"></abnormal>
+		<view class="totop">
+			<image src="http://ozb2xxoij.bkt.clouddn.com/totop.png" @tap="_goTop" wx:if="{{scrollTop>showToTopHeight}}"/>
+		</view>
+	</scroll-view>
+</template>
+<script>
+    import wepy from 'wepy'
+    import Abnormal from '../abnormal/index'
+    import * as utils from '../common/js/utils'
+    export default class WxScrollView extends wepy.component {
+        // 0 代表正在加载，1 代表暂无更多 2代表隐藏加载成功 3代表无数据 4代表加载异常
+        static LOADING = 0;
+        static NO_MORE = 1;
+        static FINISHED = 2;
+        static NO_DATA = 3;
+        static ERROR = 4;
+        components = {
+            'abnormal': Abnormal
+        }
+        props = {
+            height: {
+                type: String,
+                default: () => {
+                    let systemInfo = utils.getSystemInfoSync()
+                    return systemInfo.windowHeight
+                }
+            },
+            page: {
+                type: Object,
+                default: () => {
+                    return {
+                        num: 0,
+                        pageSize: 10,
+                    }
+                }
+            },
+            message: {
+                type: String,
+                default: '正在加载 ...'
+            },
+            noMore: {
+                type: String,
+                default: '暂无更多 ~'
+            }
+        }
+
+        data = {
+            loadingStatus: WxScrollView.LOADING,
+            toView: '',
+	        scrollTop:0,
+            minRefreshTime: 1000,
+            startRefreshTime: null,
+	        showToTopHeight:2000,
+        }
+
+        onLoad() {
+            this.$emit('upCallback', this.page);
+        }
+
+        methods = {
+            _goTop(){
+	            this.toView = 'scroll_header'
+                this.$apply()
+            },
+
+            _lower: function (e) {
+                if (this.loadingStatus == WxScrollView.FINISHED) {
+                    this._loading()
+                    this.$emit('upCallback', this.page);
+                }
+            },
+
+            _error(e){
+                this.$emit('upCallback', this.page);
+            },
+
+            _upper: function (e) {
+            },
+
+            _scroll: function (e) {
+                if(this.showToTopHeight<e.detail.scrollTop){
+                    this.toView = ''
+                }
+                this.scrollTop = e.detail.scrollTop
+	            this.$apply()
+            },
+
+            endSuccess(resultSize){
+                if (resultSize == 0 && this.page.num == 0) {
+                    this._noData()
+                } else if (resultSize < this.page.pageSize) {
+                    this._noMore()
+                } else if (resultSize == this.page.pageSize) {
+                    this._finished()
+                }
+                this.page.num++
+                this.$apply()
+            },
+            endError(){
+                this._error()
+            },
+        }
+
+        _loading() {
+            this.loadingStatus = WxScrollView.LOADING;
+        }
+
+        _noMore() {
+            this.loadingStatus = WxScrollView.NO_MORE;
+        }
+
+        _finished() {
+            this.loadingStatus = WxScrollView.FINISHED;
+        }
+
+        _noData() {
+            this.loadingStatus = WxScrollView.NO_DATA;
+        }
+
+        _error() {
+            this.loadingStatus = WxScrollView.ERROR;
+        }
+    }
+</script>

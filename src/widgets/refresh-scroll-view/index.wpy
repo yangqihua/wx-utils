@@ -1,0 +1,157 @@
+<style lang="less" rel="stylesheet/less">
+	@import "refresh-scroll-view";
+</style>
+<template>
+	<scroll-view scroll-y style="height: {{height}}px;" @scrolltoupper="_upper" @scrolltolower="_lower"
+	             @scroll="_scroll"
+	             scroll-into-view="{{toView}}">
+		<slot name="header" id="scroll_header"></slot>
+		<slot name="content">默认内容</slot>
+		<slot name="footer" id="scroll_footer"></slot>
+
+		<view wx:if="{{loadingStatus==0 || loadingStatus==2}}" class="loadmore">
+			<view class="loading"></view>
+			<view class="loadmore_tips">{{message}}</view>
+		</view>
+
+		<view wx:if="{{loadingStatus==1}}" class="loadmore no_more">
+			<view class="loadmore_tips">{{ noMore}}</view>
+		</view>
+
+		<view wx:if="{{loadingStatus==4}}" class="loadmore no_more">
+			<view class="loadmore_tips" @tap="_error"> 加载异常
+				<view class="load_error">重新加载</view>
+			</view>
+		</view>
+		<abnormal category="DATA" wx:if="{{loadingStatus==3}}"></abnormal>
+	</scroll-view>
+</template>
+<script>
+    import wepy from 'wepy'
+    import Abnormal from '../abnormal/index'
+    import * as utils from '../common/js/utils'
+    export default class WxScrollView extends wepy.component {
+        // 0 代表正在加载，1 代表暂无更多 2代表隐藏加载成功 3代表无数据 4代表加载异常
+        static LOADING = 0;
+        static NO_MORE = 1;
+        static FINISHED = 2;
+        static NO_DATA = 3;
+        static ERROR = 4;
+        components = {
+            'abnormal': Abnormal
+        }
+        props = {
+            height: {
+                type: String,
+                default: () => {
+                    let systemInfo = utils.getSystemInfoSync()
+                    return systemInfo.windowHeight
+                }
+            },
+            page: {
+                type: Object,
+                default: () => {
+                    return {
+                        num: 0,
+                        pageSize: 10,
+                    }
+                }
+            },
+            message: {
+                type: String,
+                default: '正在加载 ...'
+            },
+            noMore: {
+                type: String,
+                default: '暂无更多 ~'
+            }
+        }
+
+        data = {
+            loadingStatus: WxScrollView.LOADING,
+            toView: 'scroll_header',
+            minRefreshTime: 1000,
+            startRefreshTime: null,
+        }
+
+        onLoad() {
+            this.$emit('upCallback', this.page);
+        }
+
+        methods = {
+            _lower: function (e) {
+                console.log('_lower')
+                if (this.loadingStatus == WxScrollView.FINISHED) {
+                    this._loading()
+                    this.$emit('upCallback', this.page);
+                }
+            },
+
+            _error(e){
+                this.$emit('upCallback', this.page);
+            },
+
+            _upper: function (e) {
+            },
+            _scroll: function (e) {
+            },
+
+            endSuccess(resultSize){
+                console.log('resultSize:', resultSize)
+                if (resultSize == 0 && this.page.num == 0) {
+                    this._noData()
+                } else if (resultSize < this.page.pageSize) {
+                    this._noMore()
+                } else if (resultSize == this.page.pageSize) {
+                    this._finished()
+                }
+                this.page.num++
+                this.$apply()
+            },
+            finishPullDownRefresh(resultSize){
+                if ((new Date()).valueOf() - this.startRefreshTime > this.minRefreshTime) {
+                    wx.hideNavigationBarLoading()
+                    wx.stopPullDownRefresh()
+	                this.methods.endSuccess.apply(this,resultSize)
+                } else {
+                    let delay = parseInt(this.minRefreshTime - ((new Date()).valueOf() - this.startRefreshTime));
+                    setTimeout(() => {
+//                        this.$apply();
+                        wx.hideNavigationBarLoading()
+                        wx.stopPullDownRefresh()
+                        this.methods.endSuccess.apply(this,resultSize)
+                    }, parseInt(delay))
+                }
+            },
+            startToPullDownRefresh(){
+                this.page.num = 0
+                this.startRefreshTime = (new Date()).valueOf()
+                wx.showNavigationBarLoading()
+                this.$emit('downCallback', this.page)
+            },
+            endError(){
+                this._error()
+            },
+        }
+
+        _loading() {
+            this.loadingStatus = WxScrollView.LOADING;
+        }
+
+        _noMore() {
+            this.loadingStatus = WxScrollView.NO_MORE;
+        }
+
+        _finished() {
+            this.loadingStatus = WxScrollView.FINISHED;
+        }
+
+        _noData() {
+            this.loadingStatus = WxScrollView.NO_DATA;
+        }
+
+        _error() {
+            this.loadingStatus = WxScrollView.ERROR;
+        }
+    }
+</script>

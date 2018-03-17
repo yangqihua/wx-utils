@@ -32,6 +32,18 @@ export function createAnimation(timingFunction) {
     })
 }
 
+export function deepCopy(obj) {
+    if (typeof obj !== 'object' || !obj) {
+        return obj;
+    }
+    let newObj = obj.constructor === Array ? [] : {};
+    for (let i in obj) {
+        newObj[i] = typeof obj[i] === 'object' ?
+            deepCopy(obj[i]) : obj[i];
+    }
+    return newObj;
+}
+
 export function getDomInfo(id) {
     return new Promise((resolve, reject) => {
         wx.createSelectorQuery().select(id).boundingClientRect(function(rect){
@@ -57,25 +69,13 @@ export function pxTorpx(px) {
     return px * rate;
 }
 
-export function deepCopy(obj) {
-    if (typeof obj !== 'object' || !obj) {
-        return obj;
-    }
-    let newObj = obj.constructor === Array ? [] : {};
-    for (let i in obj) {
-        newObj[i] = typeof obj[i] === 'object' ?
-            deepCopy(obj[i]) : obj[i];
-    }
-    return newObj;
-}
-
 export function getSystemInfoSync() {
-    let systemInfo = this.globalData.systemInfo || wepy.getStorageSync('systemInfo')
+    let systemInfo = wepy.getStorageSync('systemInfo')
     if (systemInfo) {
         return systemInfo
     }
     systemInfo = wepy.getSystemInfoSync()
-    this.globalData.systemInfo = systemInfo
+    console.log('systemInfo1:',systemInfo)
     wepy.setStorageSync('systemInfo', systemInfo)
     return systemInfo
 }
