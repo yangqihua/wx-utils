@@ -1,0 +1,56 @@
+<style lang="less" rel="stylesheet/less">
+    @import "./abnormal";
+</style>
+<template>
+    <view class="wf_abnormal">
+        <view class="wf_abnormal_box">
+            <image class="wf_abnormal_image" wx:if="{{image}}" src="{{image}}" mode="widthFix"></image>
+            <view class="wf_abnormal_text" wx:if="{{title}}">{{title}}</view>
+            <view class="wf_abnormal_tip" wx:if="{{tip}}">{{tip}}</view>
+            <view class="wf_abnormal_btn" wx:if="{{button}}" @tap="emitAbnormalTap">{{button}}</view>
+        </view>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    import Types from './config'
+    export default class Abnormal extends wepy.component {
+        props = {
+            category: {
+                type: String,
+                default: '',
+            },
+            image: {
+                type: String,
+                default: ''
+            },
+            title: {
+                type: String,
+                default: ''
+            },
+            tip: {
+                type: String,
+                default: ''
+            },
+            button: {
+                type: String,
+                default: ''
+            }
+        }
+        methods = {
+            emitAbnormalTap(event) {
+                let detail = event.detail;
+                this.$emit('abnormalTap', detail);
+            }
+        }
+        onLoad() {
+            if (this.category && Types[this.category]) {
+                this.image = this.data.image || Types[this.category].image;
+                this.title = this.data.title || Types[this.category].title;
+                this.button = this.data.button || Types[this.category].button;
+                this.tip = this.data.tip || Types[this.category].tip;
+            }
+        }
+    }
+</script>

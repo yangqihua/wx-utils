@@ -1,0 +1,73 @@
+@import "variable";
+@import "icon";
+
+
+// common styles
+checkbox, radio{
+    margin-right: ~'10rpx';
+}
+
+button{
+    margin-top: ~'20rpx';
+    margin-bottom: ~'20rpx';
+}
+form{
+    width: 100%;
+}
+
+.totop {
+    image {
+        background: #000;
+        border-radius: 50%;
+        position: fixed;
+        bottom: 82rpx;
+        right: 32rpx;
+        width: 40rpx;
+        height: 40rpx;
+        padding: 16rpx;
+        opacity: 0.6;
+        z-index: 999999;
+    }
+}
+
+.over-model {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    width: 100%;
+    height: 100%;
+    top: 0;
+}
+
+.split{
+    background-color: #efefef;
+    width: 100%;
+    height: ~'18rpx';
+}
+
+// mixin class
+.btn-mixin(@bg-color:@background-color;@color:@main-text-color){
+    padding: ~'20rpx' ~'30rpx';
+    min-width: ~'240rpx';
+    background-color: @bg-color;
+    color: @color;
+    border: 0 none;
+    border-radius: @btn-radius;
+    font-size: @btn-font-size;
+    text-align: center;
+    overflow: hidden;
+}
+
+.hairline-mixin (@border-color: @hairline-color) {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 200%;
+    transform: scale(.5);
+    transform-origin: 0 0;
+    pointer-events: none;
+    box-sizing: border-box;
+    border: 0 solid @border-color;
+}

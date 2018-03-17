@@ -1,36 +1,33 @@
 <style lang="less">
 </style>
 <template>
-  <view class="container">
-  </view>
+	<view class="container">
+		<load-more/>
+	</view>
 </template>
 
 <script>
-  import wepy from 'wepy'
-  import testMixin from '../mixins/test'
+    import wepy from 'wepy'
+    import testMixin from '../mixins/test'
+    import LoadMore from '../widgets/load-more/index'
+    export default class Index extends wepy.page {
+        config = {
+            navigationBarTitleText: 'wx-utils'
+        }
+        components = {
+            'load-more':LoadMore
+        }
+        mixins = [testMixin]
 
-  export default class Index extends wepy.page {
-    config = {
-      navigationBarTitleText: 'wx-utils'
-    }
-    components = {
-    }
+        data = {}
 
-    mixins = [testMixin]
+        computed = {}
 
-    data = {
-    }
+        methods = {}
 
-    computed = {
-    }
+        events = {}
 
-    methods = {
+        onLoad() {
+        }
     }
-
-    events = {
-    }
-
-    onLoad() {
-    }
-  }
 </script>
