@@ -1,0 +1,45 @@
+<style lang="less" rel="stylesheet/less">
+	@import "toast";
+</style>
+
+<template>
+	<view class="toast" wx:if="{{ toast.show }}" bindtap="clearToast">
+		{{ toast.title }}
+	</view>
+</template>
+<script>
+    import wepy from 'wepy'
+
+    export default class Toast extends wepy.component {
+        data = {
+            toast: {}
+        }
+        methods = {
+            showToast({title = '', timeout = 2000}) {
+                let toast = this.toast || {}
+                clearTimeout(toast.timer)
+
+                // 弹层设置~
+                this.toast = {
+                    show: true,
+                    title
+                }
+                this.$apply()
+
+                let timer = setTimeout(() => {
+                    this.methods.clearToast.call(this)
+                }, timeout)
+
+                this.toast.timer = timer
+                this.$apply()
+            },
+            clearToast() {
+                let toast = this.toast || {}
+                clearTimeout(toast.timer)
+
+                this.toast.show = false
+                this.$apply()
+            }
+        }
+    }
+</script>

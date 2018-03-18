@@ -1,0 +1,90 @@
+@import "../common/assets/styles/base";
+
+.cell {
+    position: relative;
+    padding: ~'24rpx 30rpx';
+    display: flex;
+    align-items: center;
+    line-height: 1.4;
+    font-size: @title-font-size;
+    &::after {
+        .hairline-mixin();
+        border-bottom-width: 1px;
+        left: ~'30rpx';
+        right: 0;
+    }
+    .cell-body {
+        flex: 1;
+        color: @title-color;
+    }
+    .cell-text {
+        line-height: ~'48rpx';
+        font-size: @title-font-size;
+    }
+    .cell-desc {
+        line-height: 1.2;
+        font-size: @desc-font-size;
+        color: @desc-color;
+    }
+
+    .cell-icon {
+        margin-right: ~'12rpx';
+        width: @large-font-size;
+        height: @large-font-size;
+    }
+
+    .cell-right {
+        position: relative;
+        text-align: right;
+        color: @desc-color;
+    }
+
+    .cell-no-pading {
+        padding: 0;
+        .cell-body-padding {
+            padding: ~'24rpx 0 24rpx 30rpx';
+        }
+        .cell-right-padding {
+            padding: ~'24rpx 30rpx 24rpx 0';
+        }
+    }
+}
+
+
+.cell-no-border::after,
+.cell-last-child::after,
+.cell:last-child::after {
+    display: none;
+}
+
+.cell-access .cell-right {
+    padding-right: ~'26rpx';
+}
+
+.cell-access .cell-right::after {
+    position: absolute;
+    top: 50%;
+    right: ~'4rpx';
+    content: " ";
+    display: inline-block;
+    height: ~'12rpx';
+    width: ~'12rpx';
+    border-width: ~'3rpx 3rpx 0 0';
+    border-color: @hint-color;
+    border-style: solid;
+    transform: translateY(-50%) matrix(0.82, 0.82, -0.82, 0.82, 0, 0);
+}
+
+.cell-switch {
+    padding-top: ~'12rpx';
+    padding-bottom: ~'12rpx';
+}
+
+.contact {
+    margin-top: 0;
+    margin-bottom: 0;
+    .cell-body {
+        text-align: left;
+    }
+}
+

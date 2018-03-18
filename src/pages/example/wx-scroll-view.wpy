@@ -1,0 +1,123 @@
+<template>
+    <view class="container">
+        <wx-scroll-view abnormalCategory="CART">
+            <view slot="header" style="text-align: center;color:#fff;background: red;line-height: 100rpx">header</view>
+            <view slot="content" class="cc_panel_wapper">
+                <repeat for="{{list}}" key="index" index="index" item="item">
+                    <view class="cc_panel_detail">
+                        <view class="cc_panel_detail_image_wapper">
+                            <image src="{{item.img}}" mode="widthFix" class="image"/>
+                        </view>
+                        <view class="cc_panel_detail_info">
+                            <view class="title">{{item.title}}</view>
+                        </view>
+                    </view>
+                </repeat>
+            </view>
+        </wx-scroll-view>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    import testMixin from '../../mixins/test'
+    import ContentList from '../../components/content-list'
+    import Test from '../../components/test'
+    import ScrollView from '../../widgets/wx-scroll-view/index'
+    import {getData} from '../../assets/data/list'
+    export default class Index extends wepy.page {
+        config = {
+            navigationBarTitleText: 'wx-utils',
+            backgroundColor: '#efefef',
+        }
+        components = {
+            'wx-scroll-view': ScrollView,
+            'content-list': ContentList,
+            'test': Test,
+        }
+        mixins = [testMixin]
+
+        data = {
+            list: [],
+        }
+
+        computed = {}
+
+        methods = {}
+
+        events = {
+            async upCallback (page) {
+                console.log('upCallback page:',page)
+                getData().then((result) => {
+                    if (page.num == 5) {
+                        result = []
+                    }
+//                    result = []
+                    this.$invoke('wx-scroll-view', 'endSuccess', result.length)
+                    this.list = this.list.concat(result)
+                    this.$apply()
+                }).catch((e) => {
+                    this.$invoke('wx-scroll-view', 'endError')
+                })
+            },
+            tapAbnormal(event){
+                console.log('tapAbnormal event:',event)
+            }
+        }
+
+        onLoad() {
+        }
+    }
+</script>
+
+<style lang="less" rel="stylesheet/less">
+    .cc_panel_wapper {
+        margin-left: ~'-30rpx';
+        padding: ~'30rpx';
+        box-sizing: border-box;
+        &:after {
+            content: "";
+            display: block;
+            clear: both;
+        }
+
+        .cc_panel_detail {
+            width: ~'360rpx';
+            position: relative;
+            overflow: hidden;
+            font-size: 0;
+            float: left;
+            padding-left: ~'30rpx';
+            padding-bottom: ~'30rpx';
+            box-sizing: border-box;
+            &_image_wapper {
+                position: relative;
+                margin-bottom: ~'10rpx';
+                width: 100%;
+                padding-top: (188/250)*100%;
+                background: #f9f8fb;
+                border-radius: ~'6rpx';
+                .image {
+                    width: 100%;
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    border-radius: ~'6rpx';
+                }
+            }
+
+            &_info {
+                .title {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+
+                    color: #2b333b;
+                    font-size: ~'24rpx';
+                    line-height: 1.6;
+                    font-weight: 400;
+                }
+            }
+        }
+    }
+</style>

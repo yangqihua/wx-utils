@@ -1,0 +1,79 @@
+<template>
+	<view>
+
+		<view class="me_bg">
+			<image class="userinfo-avatar" src="{{ userInfo.avatarUrl }}" background-size="cover"/>
+			<view class="userinfo-nickname">{{ userInfo.nickName }}</view>
+		</view>
+
+		<view class="panel">
+			<view class="row content">
+				<repeat for="{{components}}" key="index" index="index" item="item">
+					<navigator class="cell cell-access" url="{{item.path}}">
+						<image src="../../widgets/common/assets/images/group.png" class="cell-icon"/>
+						<view class="cell-body">{{item.name}}</view>
+						<view class="cell-right"></view>
+					</navigator>
+				</repeat>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    import {components} from './config'
+    import * as utils from '../../widgets/common/js/utils'
+    export default class Index extends wepy.page {
+        config = {
+            navigationBarTitleText: 'wx-utils 演示',
+            navigationBarBackgroundColor: '#F7701A',
+            navigationBarTextStyle: '#fff',
+            backgroundColor: '#FFFFFF',
+        }
+        data = {
+            components: components,
+            userInfo: {
+                avatarUrl: '',
+                nickName: '加载中...'
+            }
+        }
+
+        onLoad() {
+            utils.getUserInfo().then((userInfo) => {
+                this.userInfo = userInfo
+                this.$apply()
+            })
+        }
+
+    }
+</script>
+
+<style lang="less" rel="stylesheet/less">
+	@import "../../widgets/cell/cell";
+	@import "../../widgets/panel/panel";
+
+	.me_bg {
+		width: ~'750rpx';
+		height: ~'240rpx';
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		background: linear-gradient(to top, #F39172, #f7701a);
+		.userinfo-avatar {
+			width: ~'120rpx';
+			height: ~'120rpx';
+			border-radius: 50%;
+		}
+		.userinfo-nickname {
+			padding-top: ~'20rpx';
+			color: #efefef;
+			font-size: ~'28rpx';
+		}
+	}
+
+	.panel {
+		margin-bottom: 20px;
+	}
+</style>

@@ -1,7 +1,7 @@
 /**
  * Created by yangqihua on 2018/3/17.
  */
-let data = [
+const data = [
     {title: '他把上海市中心240㎡小区老房，改成爆美别墅！', img: 'http://img.zcool.cn/community/01190e5a23b8b4a801216e8dfeaec7.jpeg@260w_195h_1c_1e_1o_100sh.jpg', view: 2438, like: 102},
     {title: '同人海报创作视频！', img: 'http://img.zcool.cn/community/011d835a23e12ca801216e8d6e16ea.jpeg@260w_195h_1c_1e_1o_100sh.jpg', view: 26, like: 142},
     {title: '', img: 'http://img.zcool.cn/community/010c8f5a221884a801216e8dd56d5c.jpeg@260w_195h_1c_1e_1o_100sh.jpg', view: 8564, like: 402},
@@ -23,6 +23,30 @@ let data = [
     {title: '【表情×符录】咚咚咚！你的小僵尸有重要的事宣布', img: 'http://img.zcool.cn/community/0107ee5a20c1c5a80120ba3845e9ab.jpeg@260w_195h_1c_1e_1o_100sh.jpg', view: 2345, like: 563},
     {title: 'Street ,Mask - WANG .', img: 'http://img.zcool.cn/community/0126475a20d8d2a80120ba38b3fa55.jpeg@260w_195h_1c_1e_1o_100sh.jpg', view: 3457, like: 856},
     {title: 'Cheryl Ann Tugboat “谢丽尔安”号美式复古拖船', img: 'http://img.zcool.cn/community/031149f5a23e171a80120ba388ce98a.jpg@260w_195h_1c_1e_1o_100sh.jpg', view: 5632, like: 154},
-];
+]
 
-export default data;
+export function getData() {
+    return new Promise((resolve, reject) => {
+        let requestTime = Math.ceil(((0.1 + Math.random())) * 500);
+//                reject()
+        try {
+            setTimeout(() => {
+                let result = getRandomData(data, 10);
+                resolve(result);
+            }, requestTime)
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
+
+function getRandomData(arr, count) {
+    let shuffled = arr.slice(0), i = arr.length, min = i - count, temp, index;
+    while (i-- > min) {
+        index = Math.floor((i + 1) * Math.random());
+        temp = shuffled[index];
+        shuffled[index] = shuffled[i];
+        shuffled[i] = temp;
+    }
+    return shuffled.slice(min);
+}

@@ -1,7 +1,7 @@
 /**
  * Created by yangqihua on 2018/2/23.
  */
-import wepy from 'wepy'
+import tip from './tip'
 // 判断是否为手机号
 export function isMobilePhone(mPhone) {
     let re = /^[1][3,4,5,7,8][0-9]{9}$/
@@ -64,18 +64,73 @@ export function getDomInfo(id) {
 }
 
 export function pxTorpx(px) {
-    let systemInfo = wepy.getSystemInfoSync()
+    let systemInfo = wx.getSystemInfoSync()
     let rate = 750 / systemInfo.windowWidth;
     return px * rate;
 }
 
 export function getSystemInfoSync() {
-    let systemInfo = wepy.getStorageSync('systemInfo')
+    let systemInfo = wx.getStorageSync('systemInfo')
     if (systemInfo) {
         return systemInfo
     }
-    systemInfo = wepy.getSystemInfoSync()
-    console.log('systemInfo1:',systemInfo)
-    wepy.setStorageSync('systemInfo', systemInfo)
+    systemInfo = wx.getSystemInfoSync()
+    wx.setStorageSync('systemInfo', systemInfo)
     return systemInfo
+}
+
+export async function getUserInfo() {
+    let userInfo = wx.getStorageSync('userInfo')
+    if (userInfo) {
+        return await userInfo
+    } else {
+        return await getUserInfoFromWx()
+    }
+}
+
+
+
+function resolveDeny() {
+    return new Promise(async(resolve, reject) => {
+        tip.alert({text: '拒绝授权将不能使用本程序，重新授权？'}).then((result) => {
+            wx.openSetting({
+                success: async(res) => {
+                    if (res.authSetting["scope.userInfo"]) {
+                        wx.getUserInfo({
+                            success:(userResult)=>{
+                                resolve(userResult.userInfo)
+                                console.log('重新授权成功,userInfo:', userResult.userInfo)
+                            },
+                        })
+                    } else {
+                        resolveDeny().then((userInfo) => {
+                            resolve(userInfo)
+                        }).catch((error) => reject(error))
+                    }
+                }, fail: function (error) {
+                    reject(error)
+                }
+            })
+        })
+    })
+}
+
+
+function getUserInfoFromWx() {
+    return new Promise(async(resolve, reject) => {
+        wx.getUserInfo({
+            success:(userResult)=>{
+                wx.setStorageSync('userInfo', userResult.userInfo)
+                resolve(userResult.userInfo)
+            },
+            fail:(error)=>{
+                resolveDeny().then((userInfo) => {
+                    wx.setStorageSync('userInfo', userInfo)
+                    resolve(userInfo)
+                }).catch((error) => {
+                    reject(error)
+                })
+            }
+        })
+    })
 }

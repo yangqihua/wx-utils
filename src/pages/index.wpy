@@ -1,149 +1,126 @@
 <template>
-	<view class="container">
-		<wx-scroll-view abnormalCategory="CART">
-			<view slot="header" style="text-align: center;color:$fff;background: red;line-height: 50rpx">header</view>
-			<view slot="content" class="cc_panel_wapper">
-				<repeat for="{{list}}" key="index" index="index" item="item">
-					<view class="cc_panel_detail">
-						<view class="cc_panel_detail_image_wapper">
-							<image src="{{item.img}}" mode="widthFix" class="image"/>
-						</view>
-						<view class="cc_panel_detail_info">
-							<view class="title">{{item.title}}</view>
-						</view>
-					</view>
-				</repeat>
+	<view class="container" style="padding-bottom: 30px">
+		<view class="panel">
+			<view class="cell">
+				<view class="cell-body">单行列表</view>
 			</view>
-		</wx-scroll-view>
+		</view>
+
+		<view class="panel">
+			<view class="cell">
+				<view class="cell-body">单行列表</view>
+				<view class="cell-right">描述信息</view>
+			</view>
+		</view>
+
+		<view class="panel">
+			<view class="cell">
+				<view class="cell-body">
+					<view class="cell-text">单行列表</view>
+					<view class="cell-desc">附加描述</view>
+				</view>
+				<view class="cell-right">描述信息</view>
+			</view>
+		</view>
+
+		<view class="panel">
+			<view class="cell">
+				<view class="cell-body">多行列表</view>
+			</view>
+			<view class="cell">
+				<view class="cell-body">多行列表</view>
+			</view>
+			<view class="cell">
+				<view class="cell-body">多行列表</view>
+			</view>
+		</view>
+
+		<view class="panel">
+			<view class="cell">
+				<view class="cell-body">多行列表</view>
+				<view class="cell-right">描述信息</view>
+			</view>
+			<view class="cell">
+				<view class="cell-body">多行列表</view>
+				<view class="cell-right">描述信息</view>
+			</view>
+			<view class="cell">
+				<view class="cell-body">多行列表</view>
+				<view class="cell-right">描述信息</view>
+			</view>
+		</view>
+
+		<view class="panel">
+			<view class="cell cell-switch">
+				<view class="cell-body">开关</view>
+				<view class="cell-right">
+					<switch checked/>
+				</view>
+			</view>
+		</view>
+
+		<view class="panel">
+			<view class="cell cell-access">
+				<view class="cell-body">单行列表</view>
+				<view class="cell-right"></view>
+			</view>
+		</view>
+
+		<view class="panel">
+			<view class="cell cell-access">
+				<view class="cell-body">多行列表</view>
+				<view class="cell-right"></view>
+			</view>
+			<view class="cell cell-access">
+				<view class="cell-body">多行列表</view>
+				<view class="cell-right"></view>
+			</view>
+			<view class="cell cell-access">
+				<view class="cell-body">多行列表</view>
+				<view class="cell-right"></view>
+			</view>
+		</view>
+
+		<view class="panel">
+			<view class="cell cell-access">
+				<view class="cell-body">多行列表</view>
+				<view class="cell-right">描述信息</view>
+			</view>
+			<view class="cell cell-access">
+				<view class="cell-body">多行列表</view>
+				<view class="cell-right">描述信息</view>
+			</view>
+			<view class="cell cell-access">
+				<view class="cell-body">多行列表</view>
+				<view class="cell-right">描述信息</view>
+			</view>
+		</view>
+
+		<view class="panel">
+			<view class="cell cell-access">
+				<image src="../../widgets/common/assets/images/group.png" class="cell-icon"/>
+				<view class="cell-body">我的用户</view>
+				<view class="cell-right">329个</view>
+			</view>
+			<button plain style="border:none" class="cell cell-access contact" open-type="contact">
+				<image src="../../widgets/common/assets/images/kefu.png" class="cell-icon"/>
+				<view class="cell-body">联系客服</view>
+				<view class="cell-right"></view>
+			</button>
+		</view>
 	</view>
 </template>
 
 <script>
     import wepy from 'wepy'
-    import testMixin from '../mixins/test'
-    import ContentList from '../components/content-list'
-    import Test from '../components/test'
-    import ScrollView from '../widgets/wx-scroll-view/index'
-    import data from '../assets/data/list'
-    export default class Index extends wepy.page {
+    export default class Cell extends wepy.page {
         config = {
-            navigationBarTitleText: 'wx-utils',
-            backgroundColor: '#efefef',
-        }
-        components = {
-            'wx-scroll-view': ScrollView,
-            'content-list': ContentList,
-            'test': Test,
-        }
-        mixins = [testMixin]
-
-        data = {
-            list: [],
-        }
-
-        computed = {}
-
-        methods = {}
-
-        events = {
-            async upCallback (page) {
-                console.log('upCallback page:',page)
-                this.getData().then((result) => {
-                    if (page.num == 5) {
-                        result = []
-                    }
-                    result = []
-                    this.$invoke('wx-scroll-view', 'endSuccess', result.length)
-                    this.list = this.list.concat(result)
-                    this.$apply()
-                }).catch((e) => {
-                    this.$invoke('wx-scroll-view', 'endError')
-                })
-            },
-            tapAbnormal(event){
-                console.log('tapAbnormal event:',event)
-            }
-        }
-
-        onLoad() {
-        }
-
-        getData() {
-            return new Promise((resolve, reject) => {
-                let requestTime = Math.ceil(((0.1 + Math.random())) * 500);
-//                reject()
-                try {
-                    setTimeout(() => {
-                        let result = this.getRandomData(data, 10);
-                        resolve(result);
-                    }, requestTime)
-                } catch (e) {
-                    reject(e);
-                }
-            })
-        }
-
-        getRandomData(arr, count) {
-            let shuffled = arr.slice(0), i = arr.length, min = i - count, temp, index;
-            while (i-- > min) {
-                index = Math.floor((i + 1) * Math.random());
-                temp = shuffled[index];
-                shuffled[index] = shuffled[i];
-                shuffled[i] = temp;
-            }
-            return shuffled.slice(min);
+            navigationBarTitleText: 'Cell 演示',
         }
     }
 </script>
 
 <style lang="less" rel="stylesheet/less">
-	.cc_panel_wapper {
-		margin-left: ~'-30rpx';
-		padding: ~'30rpx';
-		box-sizing: border-box;
-		&:after {
-			content: "";
-			display: block;
-			clear: both;
-		}
-
-		.cc_panel_detail {
-			width: ~'360rpx';
-			position: relative;
-			overflow: hidden;
-			font-size: 0;
-			float: left;
-			padding-left: ~'30rpx';
-			padding-bottom: ~'30rpx';
-			box-sizing: border-box;
-			&_image_wapper {
-				position: relative;
-				margin-bottom: ~'10rpx';
-				width: 100%;
-				padding-top: (188/250)*100%;
-				background: #f9f8fb;
-				border-radius: ~'6rpx';
-				.image {
-					width: 100%;
-					position: absolute;
-					left: 0;
-					top: 0;
-					border-radius: ~'6rpx';
-				}
-			}
-
-			&_info {
-				.title {
-					overflow: hidden;
-					text-overflow: ellipsis;
-					white-space: nowrap;
-
-					color: #2b333b;
-					font-size: ~'24rpx';
-					line-height: 1.6;
-					font-weight: 400;
-				}
-			}
-		}
-	}
+	@import "../widgets/cell/cell";
+	@import "../widgets/panel/panel";
 </style>

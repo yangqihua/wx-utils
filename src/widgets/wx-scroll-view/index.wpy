@@ -10,7 +10,13 @@
 		<slot name="content">默认内容</slot>
 		<slot name="footer" id="scroll_footer"></slot>
 
-		<view wx:if="{{loadingStatus==0 || loadingStatus==2}}" class="loadmore">
+		<view wx:if="{{loadingStatus==0}}" class="loadmore">
+			<view class="loading"></view>
+			<view class="loadmore_tips">{{message}}</view>
+		</view>
+
+		<view wx:if="{{loadingStatus==2}}" class="loadmore">
+			<!--<view class="loadmore_tips">上拉加载更多</view>-->
 			<view class="loading"></view>
 			<view class="loadmore_tips">{{message}}</view>
 		</view>
