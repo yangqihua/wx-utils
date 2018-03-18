@@ -1,7 +1,6 @@
 <template>
     <view class="container">
-        <wx-scroll-view abnormalCategory="CART">
-            <view slot="header" style="text-align: center;color:#fff;background: red;line-height: 100rpx">header</view>
+        <refresh-scroll-view abnormalCategory="CART">
             <view slot="content" class="cc_panel_wapper">
                 <repeat for="{{list}}" key="index" index="index" item="item">
                     <view class="cc_panel_detail">
@@ -14,58 +13,56 @@
                     </view>
                 </repeat>
             </view>
-        </wx-scroll-view>
+        </refresh-scroll-view>
     </view>
 </template>
 
 <script>
     import wepy from 'wepy'
-    import testMixin from '../../mixins/refresh-scroll-view'
-    import ContentList from '../../components/content-list'
-    import Test from '../../components/test'
-    import ScrollView from '../../widgets/wx-scroll-view/index'
+    import RefreshScrollViewMixin from '../../mixins/refresh-scroll-view'
+    import RefreshScrollView from '../../widgets/refresh-scroll-view/index'
     import {getData} from '../../assets/data/list'
     export default class Index extends wepy.page {
         config = {
-            navigationBarTitleText: 'wx-utils',
+            navigationBarTitleText: 'refresh-scroll-view',
             backgroundColor: '#efefef',
+            enablePullDownRefresh: true,
         }
         components = {
-            'wx-scroll-view': ScrollView,
-            'content-list': ContentList,
-            'test': Test,
+            'refresh-scroll-view': RefreshScrollView,
         }
-        mixins = [testMixin]
+        mixins = [RefreshScrollViewMixin]
 
         data = {
             list: [],
         }
-
-        computed = {}
-
-        methods = {}
-
         events = {
             async upCallback (page) {
-                console.log('upCallback page:',page)
                 getData().then((result) => {
-                    if (page.num == 5) {
+                    if (page.num == 10) {
                         result = []
                     }
 //                    result = []
-                    this.$invoke('wx-scroll-view', 'endSuccess', result.length)
+                    this.$invoke('refresh-scroll-view', 'endSuccess', result.length)
                     this.list = this.list.concat(result)
                     this.$apply()
                 }).catch((e) => {
-                    this.$invoke('wx-scroll-view', 'endError')
+                    this.$invoke('refresh-scroll-view', 'endError')
+                })
+            },
+            async downCallback (page) {
+                getData().then((result) => {
+//                    result = []
+                    this.$invoke('refresh-scroll-view', 'endRefresh', result.length)
+                    this.list = result
+                    this.$apply()
+                }).catch((e) => {
+                    this.$invoke('refresh-scroll-view', 'endRefreshError')
                 })
             },
             tapAbnormal(event){
                 console.log('tapAbnormal event:',event)
             }
-        }
-
-        onLoad() {
         }
     }
 </script>

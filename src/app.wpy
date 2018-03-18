@@ -17,8 +17,9 @@
     export default class extends wepy.app {
         config = {
             pages: [
+	            'pages/example/refresh-scroll-view',
                 'pages/example/index',
-                'pages/example/wx-scroll-view'
+                'pages/example/wx-scroll-view',
             ],
             window: {
                 backgroundTextStyle: 'light',

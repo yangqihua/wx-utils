@@ -1,15 +1,17 @@
 <style lang="less" rel="stylesheet/less">
-	@import "refresh-scroll-view";
+	@import "../wx-scroll-view/wx-scroll-view";
 </style>
 <template>
-	<scroll-view scroll-y style="height: {{height}}px;" @scrolltoupper="_upper" @scrolltolower="_lower"
-	             @scroll="_scroll"
-	             scroll-into-view="{{toView}}">
-		<slot name="header" id="scroll_header"></slot>
+	<view style="width: 100%">
 		<slot name="content">默认内容</slot>
-		<slot name="footer" id="scroll_footer"></slot>
 
-		<view wx:if="{{loadingStatus==0 || loadingStatus==2}}" class="loadmore">
+		<view wx:if="{{loadingStatus==0}}" class="loadmore">
+			<view class="loading"></view>
+			<view class="loadmore_tips">{{message}}</view>
+		</view>
+
+		<view wx:if="{{loadingStatus==2}}" class="loadmore">
+			<!--<view class="loadmore_tips">上拉加载更多</view>-->
 			<view class="loading"></view>
 			<view class="loadmore_tips">{{message}}</view>
 		</view>
@@ -19,12 +21,16 @@
 		</view>
 
 		<view wx:if="{{loadingStatus==4}}" class="loadmore no_more">
-			<view class="loadmore_tips" @tap="_error"> 加载异常
-				<view class="load_error">重新加载</view>
+			<view class="loadmore_tips"> 加载异常
+				<view class="load_error" @tap="_error">重新加载</view>
 			</view>
 		</view>
-		<abnormal category="DATA" wx:if="{{loadingStatus==3}}"></abnormal>
-	</scroll-view>
+		<abnormal :category.sync="abnormalCategory" wx:if="{{loadingStatus==3}}"></abnormal>
+		<view class="totop">
+			<image src="http://ozb2xxoij.bkt.clouddn.com/totop.png" @tap="_goTop"
+			       wx:if="{{scrollTop>showToTopHeight}}"/>
+		</view>
+	</view>
 </template>
 <script>
     import wepy from 'wepy'
@@ -41,13 +47,6 @@
             'abnormal': Abnormal
         }
         props = {
-            height: {
-                type: String,
-                default: () => {
-                    let systemInfo = utils.getSystemInfoSync()
-                    return systemInfo.windowHeight
-                }
-            },
             page: {
                 type: Object,
                 default: () => {
@@ -64,36 +63,47 @@
             noMore: {
                 type: String,
                 default: '暂无更多 ~'
-            }
+            },
+            showToTopHeight: {
+                type: Number,
+                default: 2000,
+            },
+            abnormalCategory:{
+                type: String,
+                default: 'DATA'
+            },
         }
 
         data = {
-            loadingStatus: WxScrollView.LOADING,
-            toView: 'scroll_header',
-            minRefreshTime: 1000,
-            startRefreshTime: null,
+            loadingStatus: WxScrollView.FINISHED,
+            scrollTop: 0,
         }
 
         onLoad() {
-            this.$emit('upCallback', this.page);
+            this.methods.loadMore.apply(this);
         }
 
         methods = {
-            _lower: function (e) {
-                console.log('_lower')
+            loadMore(){
                 if (this.loadingStatus == WxScrollView.FINISHED) {
                     this._loading()
                     this.$emit('upCallback', this.page);
                 }
             },
-
-            _error(e){
-                this.$emit('upCallback', this.page);
+            refresh(){
+                this.page.num = 0
+                wx.showNavigationBarLoading()
+                this.$emit('downCallback', this.page)
             },
-
-            _upper: function (e) {
+            endRefresh(resultSize){
+                wx.hideNavigationBarLoading()
+                wx.stopPullDownRefresh()
+                this.methods.endSuccess.call(this, resultSize)
             },
-            _scroll: function (e) {
+            endRefreshError(){
+                wx.hideNavigationBarLoading()
+                wx.stopPullDownRefresh()
+                this.methods.endError.call(this)
             },
 
             endSuccess(resultSize){
@@ -108,30 +118,28 @@
                 this.page.num++
                 this.$apply()
             },
-            finishPullDownRefresh(resultSize){
-                if ((new Date()).valueOf() - this.startRefreshTime > this.minRefreshTime) {
-                    wx.hideNavigationBarLoading()
-                    wx.stopPullDownRefresh()
-	                this.methods.endSuccess.apply(this,resultSize)
-                } else {
-                    let delay = parseInt(this.minRefreshTime - ((new Date()).valueOf() - this.startRefreshTime));
-                    setTimeout(() => {
-//                        this.$apply();
-                        wx.hideNavigationBarLoading()
-                        wx.stopPullDownRefresh()
-                        this.methods.endSuccess.apply(this,resultSize)
-                    }, parseInt(delay))
-                }
+
+            onPageScroll(e){
+                this.scrollTop = e.scrollTop
             },
-            startToPullDownRefresh(){
-                this.page.num = 0
-                this.startRefreshTime = (new Date()).valueOf()
-                wx.showNavigationBarLoading()
-                this.$emit('downCallback', this.page)
-            },
+
             endError(){
                 this._error()
             },
+
+            _error(e){
+                this.$emit('upCallback', this.page);
+            },
+
+            _goTop(){
+                wx.pageScrollTo({scrollTop: 0})
+            },
+        }
+
+        events = {
+            abnormalTap(event){
+                this.$emit('tapAbnormal', event);
+            }
         }
 
         _loading() {
