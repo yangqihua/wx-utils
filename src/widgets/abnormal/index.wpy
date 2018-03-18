@@ -40,8 +40,7 @@
         }
         methods = {
             emitAbnormalTap(event) {
-                let detail = event.detail;
-                this.$emit('abnormalTap', detail);
+                this.$emit('abnormalTap', event);
             }
         }
         onLoad() {

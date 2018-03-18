@@ -1,6 +1,7 @@
 <template>
 	<view class="container">
-		<wx-scroll-view>
+		<wx-scroll-view abnormalCategory="CART">
+			<view slot="header" style="text-align: center;color:$fff;background: red;line-height: 50rpx">header</view>
 			<view slot="content" class="cc_panel_wapper">
 				<repeat for="{{list}}" key="index" index="index" item="item">
 					<view class="cc_panel_detail">
@@ -51,7 +52,7 @@
                     if (page.num == 5) {
                         result = []
                     }
-//                    result = []
+                    result = []
                     this.$invoke('wx-scroll-view', 'endSuccess', result.length)
                     this.list = this.list.concat(result)
                     this.$apply()
@@ -59,6 +60,9 @@
                     this.$invoke('wx-scroll-view', 'endError')
                 })
             },
+            tapAbnormal(event){
+                console.log('tapAbnormal event:',event)
+            }
         }
 
         onLoad() {

@@ -20,11 +20,11 @@
 		</view>
 
 		<view wx:if="{{loadingStatus==4}}" class="loadmore no_more">
-			<view class="loadmore_tips" @tap="_error"> 加载异常
-				<view class="load_error">重新加载</view>
+			<view class="loadmore_tips"> 加载异常
+				<view class="load_error" @tap="_error">重新加载</view>
 			</view>
 		</view>
-		<abnormal category="DATA" wx:if="{{loadingStatus==3}}"></abnormal>
+		<abnormal :category.sync="abnormalCategory" wx:if="{{loadingStatus==3}}"></abnormal>
 		<view class="totop">
 			<image src="http://ozb2xxoij.bkt.clouddn.com/totop.png" @tap="_goTop" wx:if="{{scrollTop>showToTopHeight}}"/>
 		</view>
@@ -61,6 +61,10 @@
                     }
                 }
             },
+	        abnormalCategory:{
+                type: String,
+                default: 'DATA'
+            },
             message: {
                 type: String,
                 default: '正在加载 ...'
@@ -81,7 +85,14 @@
         }
 
         onLoad() {
+            console.log('this.abnormalCategory:',this.abnormalCategory)
             this.$emit('upCallback', this.page);
+        }
+
+        events = {
+            abnormalTap(event){
+                this.$emit('tapAbnormal', event);
+            }
         }
 
         methods = {
@@ -114,6 +125,7 @@
 
             endSuccess(resultSize){
                 if (resultSize == 0 && this.page.num == 0) {
+                    console.log('no data')
                     this._noData()
                 } else if (resultSize < this.page.pageSize) {
                     this._noMore()
