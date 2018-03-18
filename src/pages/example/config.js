@@ -1,10 +1,10 @@
 export const components = [
     {
-        name: 'Scroll-view 无限加载',
+        name: 'Scroll-view 上拉加载',
         path: '/pages/example/wx-scroll-view'
     },
     {
-        name: 'Refresh-scroll-view 下拉刷新，下拉加载',
+        name: 'Refresh-scroll-view 下拉刷新，上拉加载',
         path: '/pages/example/refresh-scroll-view'
     },
 

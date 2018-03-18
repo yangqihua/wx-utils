@@ -8,7 +8,7 @@
                             <image src="{{item.img}}" mode="widthFix" class="image"/>
                         </view>
                         <view class="cc_panel_detail_info">
-                            <view class="title">{{item.title}}</view>
+                            <view class="title">{{item.title || '未知描述'}}</view>
                         </view>
                     </view>
                 </repeat>
@@ -24,7 +24,7 @@
     import {getData} from '../../assets/data/list'
     export default class Index extends wepy.page {
         config = {
-            navigationBarTitleText: 'refresh-scroll-view',
+            navigationBarTitleText: 'Refresh-scroll-view 下拉刷新，上拉加载',
             backgroundColor: '#efefef',
             enablePullDownRefresh: true,
         }
@@ -39,7 +39,7 @@
         events = {
             async upCallback (page) {
                 getData().then((result) => {
-                    if (page.num == 10) {
+                    if (page.num == 5) {
                         result = []
                     }
 //                    result = []
@@ -68,6 +68,7 @@
 </script>
 
 <style lang="less" rel="stylesheet/less">
+
     .cc_panel_wapper {
         margin-left: ~'-30rpx';
         padding: ~'30rpx';

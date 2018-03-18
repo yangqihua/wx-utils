@@ -9,7 +9,7 @@
                             <image src="{{item.img}}" mode="widthFix" class="image"/>
                         </view>
                         <view class="cc_panel_detail_info">
-                            <view class="title">{{item.title}}</view>
+                            <view class="title">{{item.title  || '未知描述'}}</view>
                         </view>
                     </view>
                 </repeat>
@@ -27,7 +27,7 @@
     import {getData} from '../../assets/data/list'
     export default class Index extends wepy.page {
         config = {
-            navigationBarTitleText: 'wx-utils',
+            navigationBarTitleText: 'Scroll-view 上拉加载',
             backgroundColor: '#efefef',
         }
         components = {
